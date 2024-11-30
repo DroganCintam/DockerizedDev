@@ -5,4 +5,4 @@ ssh-keygen -R $(docker inspect \
     code-docker)
 
 # If you're using OrbStack, you can also use the following command:
-# ssh-keygen -R code-docker
+# ssh-keygen -R code-docker.orb.local

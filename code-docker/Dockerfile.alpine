@@ -1,0 +1,23 @@
+FROM alpine
+
+# Install SSH server
+# Also libstdc++ is needed for VSCode Server
+# You can install any other tools you need here
+RUN apk update && \
+    apk add --no-cache libstdc++ openssh-server && \
+    rm -rf /var/cache/apk/*
+
+# Provide the public key as a build argument
+ARG ssh_pub_key
+
+# Prepare the key for SSH login and allow tcp forwarding
+RUN mkdir /root/.ssh && \
+    echo "$ssh_pub_key" > /root/.ssh/authorized_keys && \
+    chmod 600 /root/.ssh/authorized_keys && \
+    ssh-keygen -A && \
+    sed -i s/AllowTcpForwarding.*/AllowTcpForwarding\ yes/ /etc/ssh/sshd_config
+
+WORKDIR /home
+
+# Start the SSH server and keep it running
+ENTRYPOINT /usr/sbin/sshd -D && bash

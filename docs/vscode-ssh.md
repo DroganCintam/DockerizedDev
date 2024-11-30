@@ -49,28 +49,35 @@ ssh-keygen -t rsa -C code@docker -f ~/.ssh/code-docker
 
 The following Dockerfile sets up a basic image
 with SSH server and the public key in its
-corresponding location.
+corresponding location. Within this document, we
+will use Alpine Linux as the base image. You can
+see the Dockerfile for Ubuntu in the `code-docker`
+directory.
 
 ```Dockerfile
-FROM ubuntu
+FROM alpine
+
+# Install SSH server
+# Also libstdc++ is needed for VSCode Server
+# You can install any other tools you need here
+RUN apk update && \
+    apk add --no-cache libstdc++ openssh-server && \
+    rm -rf /var/cache/apk/*
 
 # Provide the public key as a build argument
 ARG ssh_pub_key
 
-# Prepare the key for SSH login
+# Prepare the key for SSH login and allow tcp forwarding
 RUN mkdir /root/.ssh && \
     echo "$ssh_pub_key" > /root/.ssh/authorized_keys && \
-    chmod 600 /root/.ssh/authorized_keys
+    chmod 600 /root/.ssh/authorized_keys && \
+    ssh-keygen -A && \
+    sed -i s/AllowTcpForwarding.*/AllowTcpForwarding\ yes/ /etc/ssh/sshd_config
 
-# Install SSH server
-# You can install any other tools you need here
-RUN apt update && \
-    apt install -y openssh-server && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/*
+WORKDIR /home
 
 # Start the SSH server and keep it running
-ENTRYPOINT service ssh start && bash
+ENTRYPOINT /usr/sbin/sshd -D && bash
 ```
 
 ### Build and Run
@@ -120,19 +127,19 @@ Host docker
   IdentityFile <absolute path to code-docker>
 ```
 
-> It is important to note that the path of
-> the `IdentityFile` should be an **absolute**
-> path. If you use `~` to represent your home,
-> VSCode may fail to find the key.
+> The title of the host, `docker`, is arbitrary.
+> You can use any title you like.
+
+It is important to note that the path of the
+`IdentityFile` should be an **absolute** path. If
+you use `~` to represent your home, VSCode may
+fail to find the key.
 
 So it should be:
 
 - `C:\Users\username\.ssh\code-docker` (Windows)
 - `/Users/username/.ssh/code-docker` (MacOS)
 - `/home/username/.ssh/code-docker` (Linux)
-
-> The name of the host, `docker`, is arbitrary.
-> You can use any name you like.
 
 Test the connection with the following command:
 
@@ -177,7 +184,7 @@ is not running or that the IP address is
 incorrect. Make sure that the container is running
 and that the IP address is correct.
 
-### Remote fingerprint does not match
+### Remote host key has changed
 
 If you get this error, it means that the SSH key
 of the container has changed. This can happen if
