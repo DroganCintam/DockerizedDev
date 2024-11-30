@@ -20,4 +20,4 @@ RUN mkdir /root/.ssh && \
 WORKDIR /home
 
 # Start the SSH server and keep it running
-ENTRYPOINT /usr/sbin/sshd -D && bash
+ENTRYPOINT /usr/sbin/sshd -D && /bin/sh
