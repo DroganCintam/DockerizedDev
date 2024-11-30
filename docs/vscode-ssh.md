@@ -7,6 +7,9 @@ connect to Docker containers running on the local
 machine, allowing you to edit code and run
 commands inside the isolated environment.
 
+You can always skip this document and go directly
+to the `code-docker` directory for example code.
+
 ## Prerequisites
 
 - [VSCode](https://code.visualstudio.com/)
