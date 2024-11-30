@@ -33,6 +33,8 @@ pair and saves it to the `.ssh` directory:
 ssh-keygen -t rsa -C code@docker -f ~/.ssh/code-docker
 ```
 
+> Leave the passphrase empty when prompted.
+
 2 files will be created:
 
 - `~/.ssh/code-docker`: private key
@@ -58,10 +60,11 @@ directory.
 FROM alpine
 
 # Install SSH server
-# Also libstdc++ is needed for VSCode Server
+# Also libstdc++ is needed for VSCode Server on Alpine
 # You can install any other tools you need here
 RUN apk update && \
-    apk add --no-cache libstdc++ openssh-server && \
+    apk add --no-cache openssh-server && \
+    apk add --no-cache libstdc++ && \
     rm -rf /var/cache/apk/*
 
 # Provide the public key as a build argument
@@ -77,7 +80,7 @@ RUN mkdir /root/.ssh && \
 WORKDIR /home
 
 # Start the SSH server and keep it running
-ENTRYPOINT /usr/sbin/sshd -D && bash
+ENTRYPOINT /usr/sbin/sshd -D && /bin/sh
 ```
 
 ### Build and Run

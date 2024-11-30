@@ -1,10 +1,10 @@
 FROM alpine
 
-# Install SSH server
+# Install Git and SSH (server and client)
 # Also libstdc++ is needed for VSCode Server on Alpine
 # You can install any other tools you need here
 RUN apk update && \
-    apk add --no-cache openssh-server && \
+    apk add --no-cache git openssh && \
     apk add --no-cache libstdc++ && \
     rm -rf /var/cache/apk/*
 
