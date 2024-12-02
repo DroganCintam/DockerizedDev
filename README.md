@@ -11,3 +11,4 @@ machine.
 
 - [SSH to Container with VSCode](docs/vscode-ssh.md)
 - [Git in Container](docs/git-docker.md)
+- VSCode Dev Container (coming soon)
