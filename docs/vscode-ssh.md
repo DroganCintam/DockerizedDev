@@ -98,25 +98,17 @@ This will create an image named `code-docker`.
 Run the container with the following command:
 
 ```bash
-docker run -d -it -p 22 \
+docker run -d -it -p 2222:22 \
     --name code-docker \
     code-docker
 ```
 
 The container is now running with the name
-`code-docker`. To SSH into it, you will need to
-know the forwarded port. You can find it with the
-following command:
-
-```bash
-docker port code-docker
-
-# Result looks like
-# 22/tcp -> 0.0.0.0:12345
-```
+`code-docker` and mapped to port `2222`. You can
+choose another port if you like.
 
 The full address to the container will be
-`localhost:<port>`.
+`localhost:2222`.
 
 If you are using OrbStack, you can use the domain
 `code-docker.orb.local` instead.
@@ -130,7 +122,7 @@ exist, just create it.
 ```ssh-config
 Host docker
   HostName localhost
-  Port 12345
+  Port 2222
   User root
   IdentityFile <path to code-docker key>
 ```
@@ -210,9 +202,9 @@ command:
 ```bash
 ssh-keygen -R <IP address or domain>
 
-# Examples:
+# The following command will work for any port mapping you chose:
 # ssh-keygen -R [localhost]:$(docker inspect --format='{{(index (index .NetworkSettings.Ports \"22/tcp\") 0).HostPort}}' code-docker)
 #
-# or, for OrbStack:
+# For OrbStack, it's even simpler:
 # ssh-keygen -R code-docker.orb.local
 ```
