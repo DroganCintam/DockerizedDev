@@ -69,10 +69,21 @@ Add a new section to the `config` file:
 
 ```ssh-config
 Host git-docker
-    HostName <ip or domain>
+    HostName localhost
+    Port 12345
     User root
-    IdentityFile <absolute path to code-docker>
+    IdentityFile <path to code-docker key>
 ```
+
+For OrbStack, use domain instead:
+
+```ssh-config
+Host git-docker
+    HostName git-docker.orb.local
+    User root
+    IdentityFile <path to code-docker key>
+```
+
 
 ## GitHub SSH
 

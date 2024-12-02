@@ -105,17 +105,21 @@ docker run -d -it -p 22 \
 
 The container is now running with the name
 `code-docker`. To SSH into it, you will need to
-know its IP address. You can find it with the
+know the forwarded port. You can find it with the
 following command:
 
 ```bash
-docker inspect \
-    -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' \
-    code-docker
+docker port code-docker
+
+# Result looks like
+# 22/tcp -> 0.0.0.0:12345
 ```
 
-If you are using OrbStack, you can use the
-domain `code-docker.orb.local` instead.
+The full address to the container will be
+`localhost:<port>`.
+
+If you are using OrbStack, you can use the domain
+`code-docker.orb.local` instead.
 
 ### Update SSH Configuration
 
@@ -125,24 +129,30 @@ exist, just create it.
 
 ```ssh-config
 Host docker
-  HostName <ip or domain>
+  HostName localhost
+  Port 12345
   User root
-  IdentityFile <absolute path to code-docker>
+  IdentityFile <path to code-docker key>
+```
+
+For OrbStack, we can use the domain instead:
+
+```ssh-config
+Host docker
+  HostName code-docker.orb.local
+  User root
+  IdentityFile <path to code-docker key>
 ```
 
 > The title of the host, `docker`, is arbitrary.
 > You can use any title you like.
 
-It is important to note that the path of the
+It is important to note, on MacOS, the path of the
 `IdentityFile` should be an **absolute** path. If
 you use `~` to represent your home, VSCode may
 fail to find the key.
 
-So it should be:
-
-- `C:\Users\username\.ssh\code-docker` (Windows)
-- `/Users/username/.ssh/code-docker` (MacOS)
-- `/home/username/.ssh/code-docker` (Linux)
+So it should be: `/Users/username/.ssh/code-docker`
 
 Test the connection with the following command:
 
@@ -199,4 +209,10 @@ command:
 
 ```bash
 ssh-keygen -R <IP address or domain>
+
+# Examples:
+# ssh-keygen -R [localhost]:$(docker inspect --format='{{(index (index .NetworkSettings.Ports \"22/tcp\") 0).HostPort}}' code-docker)
+#
+# or, for OrbStack:
+# ssh-keygen -R code-docker.orb.local
 ```
